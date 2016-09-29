@@ -1,8 +1,6 @@
 (function () {
   'use strict';
 
-  console.log('running');
-
   angular.module('NarrowItDownApp', [])
     .service('MenuSearchService', MenuSearchService)
     .controller('NarrowItDownController', NarrowItDownController)
