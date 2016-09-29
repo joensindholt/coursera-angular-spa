@@ -1,60 +1,87 @@
 (function () {
-    'use strict';
+  'use strict';
 
-    angular.module('ShoppingListCheckOff', []);
+  console.log('running');
 
-    // ****************************************
-    // ShoppingListCheckOffService
-    // ****************************************
-    ShoppingListCheckOffService.$inject = [];
+  angular.module('NarrowItDownApp', [])
+    .service('MenuSearchService', MenuSearchService)
+    .controller('NarrowItDownController', NarrowItDownController)
+    .directive('foundItems', MyFoundItems);
 
-    function ShoppingListCheckOffService() {
-        var service = this;
+  // ****************************************
+  // MenuSearchService
+  // ****************************************
+  MenuSearchService.$inject = ['$http'];
 
-        service.itemsToBuy = [
-            {
-                quantity: 10,
-                name: 'Bananas'
-            }, {
-                quantity: 5,
-                name: 'Carrots'
-            }, {
-                quantity: 7,
-                name: 'Aubergine'
-            }];
+  function MenuSearchService($http) {
+    var service = this;
 
-        service.boughtItems = [];
+    service.getMatchedMenuItems = function (searchTerm) {
+      return $http({
+        url: 'https://davids-restaurant.herokuapp.com/menu_items.json'
+      }).then(function (result) {
+        return result.data.menu_items;
+      });
+    }
+  }
 
-        service.markItemAsBought = function (itemIndex) {
-            var item = service.itemsToBuy[itemIndex];
-            service.itemsToBuy.splice(itemIndex, 1);
-            service.boughtItems.push(item);
+  // ****************************************
+  // NarrowItDownController
+  // ****************************************
+  NarrowItDownController.$inject = ['MenuSearchService'];
+
+  function NarrowItDownController(MenuSearchService) {
+    var ctrl = this;
+
+    ctrl.found = [];
+    ctrl.message = null;
+
+    ctrl.getMatchedMenuItems = function (searchTerm) {
+      ctrl.found = [];
+
+      // if the user supplied no search term display 'Nothing found'      
+      if (!searchTerm) {
+        ctrl.message = 'Nothing found';
+        return;
+      }
+
+      MenuSearchService.getMatchedMenuItems(searchTerm).then(function (items) {
+        // Loop though the list of items filtering it using searchTerm 
+        for (var i = 0; i < items.length; i++) {
+          if (items[i].name.indexOf(searchTerm) !== -1) {
+            ctrl.found.push(items[i]);
+          }
         }
-    }
 
-    // ****************************************
-    // ToBuyShoppingController
-    // ****************************************
-    ToBuyShoppingController.$inject = ['ShoppingListCheckOffService'];
-
-    function ToBuyShoppingController(ShoppingListCheckOffService) {
-        var toBuyCtrl = this;
-
-        toBuyCtrl.itemsToBuy = ShoppingListCheckOffService.itemsToBuy;
-
-        toBuyCtrl.markItemAsBought = function (itemIndex) {
-            ShoppingListCheckOffService.markItemAsBought(itemIndex);
+        // If no items where found show 'Nothing found'
+        if (ctrl.found.length === 0) {
+          ctrl.message = 'Nothing found';
         }
+        else {
+          ctrl.message = null;
+        }
+      });
     }
 
-    // ****************************************
-    // AlreadyBoughtShoppingController
-    // ****************************************
-    AlreadyBoughtShoppingController.$inject = ['ShoppingListCheckOffService'];
-
-    function AlreadyBoughtShoppingController(ShoppingListCheckOffService) {
-        var alreadyBoughtCtrl = this;
-
-        alreadyBoughtCtrl.boughtItems = ShoppingListCheckOffService.boughtItems;
+    ctrl.removeMenuItem = function (itemIndex) {
+      ctrl.found.splice(itemIndex, 1);
     }
+  }
+
+  // ****************************************
+  // MyFoundItems
+  // ****************************************
+  function MyFoundItems() {
+    var ddo = {
+      restrict: 'E',
+      scope: {
+        found: '<',
+        onRemove: '&'
+      },
+      templateUrl: 'found-items-directive.html'
+    };
+
+    return ddo;
+  }
+
 })();
