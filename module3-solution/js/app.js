@@ -6,7 +6,7 @@
   angular.module('NarrowItDownApp', [])
     .service('MenuSearchService', MenuSearchService)
     .controller('NarrowItDownController', NarrowItDownController)
-    .directive('foundItems', MyFoundItems);
+    .directive('foundItems', FoundItems);
 
   // ****************************************
   // MenuSearchService
@@ -69,9 +69,9 @@
   }
 
   // ****************************************
-  // MyFoundItems
+  // FoundItems
   // ****************************************
-  function MyFoundItems() {
+  function FoundItems() {
     var ddo = {
       restrict: 'E',
       scope: {
