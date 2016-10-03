@@ -46,7 +46,7 @@
       MenuSearchService.getMatchedMenuItems(searchTerm).then(function (items) {
         // Loop though the list of items filtering it using searchTerm 
         for (var i = 0; i < items.length; i++) {
-          if (items[i].name.indexOf(searchTerm) !== -1) {
+          if (items[i].description.indexOf(searchTerm) !== -1) {
             ctrl.found.push(items[i]);
           }
         }
