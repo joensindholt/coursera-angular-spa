@@ -1,1 +1,1 @@
-Module 4 Solution
+Solution for assigment 3 of the Coursera course: Single Page Web Applications with AngularJS
